@@ -771,7 +771,12 @@ func typeName(c *gocore.Process, x gocore.Object) string {
 		return fmt.Sprintf("unk%d", size)
 	}
 	name := typ.String()
-	n := size / typ.Size
+
+	var n int64 = 0
+	if typ.Size != 0 {
+		n = size / typ.Size
+	}
+
 	if n > 1 {
 		if repeat < n {
 			name = fmt.Sprintf("[%d+%d?]%s", repeat, n-repeat, name)
@@ -789,8 +794,11 @@ func fieldName(c *gocore.Process, x gocore.Object, off int64) string {
 	if typ == nil {
 		return fmt.Sprintf("f%d", off)
 	}
-	n := size / typ.Size
-	i := off / typ.Size
+	var n, i int64
+	if typ.Size != 0 {
+		n = size / typ.Size
+		i = off / typ.Size
+	}
 	if i == 0 && repeat == 1 {
 		// Probably a singleton object, no need for array notation.
 		return typeFieldName(typ, off)
